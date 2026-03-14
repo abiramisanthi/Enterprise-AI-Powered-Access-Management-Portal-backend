@@ -25,6 +25,19 @@ const accessRequestSchema = new mongoose.Schema({
         required: true,
         minlength: 10
     },
+    priority: {
+        type: String,
+        enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
+        default: 'MEDIUM'
+    },
+    expiryDays: {
+        type: Number,
+        default: null // Number of days the access is valid for
+    },
+    expiryDate: {
+        type: Date,
+        default: null // Calculated when approved
+    },
     status: {
         type: String,
         enum: ['PENDING', 'APPROVED', 'REJECTED'],

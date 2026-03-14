@@ -4,6 +4,8 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 // Load environment variables
 dotenv.config();
@@ -13,14 +15,22 @@ connectDB();
 
 const app = express();
 
-// ✅ CORS Configuration
+// ✅ Security Middleware
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+})); 
+
+// ✅ Rate Limiting setup
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: "Too many requests from this IP, please try again after 15 minutes"
+});
+app.use(limiter);
+
+// ✅ Allow All Origins for Local Development to prevent Failed to Fetch issues
 app.use(cors({
-    origin: [
-        "http://localhost:5500",     // if using Live Server
-        "http://127.0.0.1:5500",
-        "http://localhost:3000",     // if using dev server
-        "https://fsd05-frontend.onrender.com"
-    ],
+    origin: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true

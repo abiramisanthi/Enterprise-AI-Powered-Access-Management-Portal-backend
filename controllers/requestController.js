@@ -1,5 +1,7 @@
 import { validationResult } from 'express-validator';
 import AccessRequest from '../models/AccessRequest.js';
+import User from '../models/User.js';
+import sendEmail from '../utils/sendEmail.js';
 
 // @desc    Create new access request
 // @route   POST /api/requests
@@ -12,7 +14,7 @@ export const createAccessRequest = async (req, res) => {
     }
 
     try {
-        const { resourceName, accessType, reason } = req.body;
+        const { resourceName, accessType, reason, priority, expiryDays } = req.body;
 
         // CRITICAL BUSINESS RULE: Check if user already has a pending request
         const existingPendingRequest = await AccessRequest.findOne({
@@ -38,7 +40,9 @@ export const createAccessRequest = async (req, res) => {
             requesterName: req.user.username,
             resourceName,
             accessType,
-            reason
+            reason,
+            priority: priority || 'MEDIUM',
+            expiryDays: expiryDays || null
         });
 
         res.status(201).json({
@@ -126,7 +130,33 @@ export const updateRequestStatus = async (req, res) => {
         accessRequest.approvalDate = new Date();
         accessRequest.comments = comments || '';
 
+        // Calculate expiry date if approved and has expiry days
+        if (status === 'APPROVED' && accessRequest.expiryDays) {
+            const expDate = new Date();
+            expDate.setDate(expDate.getDate() + accessRequest.expiryDays);
+            accessRequest.expiryDate = expDate;
+        }
+
         await accessRequest.save();
+
+        // 📧 Try sending an email notification to the requester
+        try {
+            const requester = await User.findById(accessRequest.requester);
+            if (requester && requester.email) {
+                const message = `Hello ${requester.username},\n\nYour access request for '${accessRequest.resourceName}' has been ${status}.\n\n`
+                    + `Reviewed By: ${req.user.username}\nComments: ${comments || 'None'}\n`
+                    + (accessRequest.expiryDate ? `\nAccess Expires On: ${accessRequest.expiryDate.toDateString()}` : '');
+                
+                await sendEmail({
+                    email: requester.email,
+                    subject: `Access Request ${status} - ${accessRequest.resourceName}`,
+                    message: message
+                });
+            }
+        } catch (emailErr) {
+            console.error('Email sending failed:', emailErr);
+            // We don't fail the request if email fails, it's just a notification
+        }
 
         res.json({
             message: `Access request ${status.toLowerCase()} successfully`,
