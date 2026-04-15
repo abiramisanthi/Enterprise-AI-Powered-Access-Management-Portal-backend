@@ -141,19 +141,28 @@ app.use(limiter);
 //
 // CORS
 //
+//
+// CORS
+//
 app.use(
     cors({
-        origin: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        origin: [
+            "https://fsd05-frontend.onrender.com",
+            "http://localhost:3000",
+            "http://localhost:5173"
+        ],
+        methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: [
-            'Content-Type',
-            'Authorization'
+            "Content-Type",
+            "Authorization"
         ],
         credentials: true
     })
 );
 
-app.options('*', cors());
+app.options("*", cors());
+
+
 
 //
 // Body parsing
