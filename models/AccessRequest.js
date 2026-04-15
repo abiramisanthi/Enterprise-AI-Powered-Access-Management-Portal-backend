@@ -25,6 +25,11 @@ const accessRequestSchema = new mongoose.Schema({
         required: true,
         minlength: 10
     },
+    department: {
+        type: String,
+        default: 'General',
+        trim: true
+    },
     priority: {
         type: String,
         enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
@@ -32,11 +37,11 @@ const accessRequestSchema = new mongoose.Schema({
     },
     expiryDays: {
         type: Number,
-        default: null // Number of days the access is valid for
+        default: null
     },
     expiryDate: {
         type: Date,
-        default: null // Calculated when approved
+        default: null
     },
     status: {
         type: String,
@@ -60,22 +65,77 @@ const accessRequestSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+
+    // ── AI Fields ──────────────────────────────────────────
+
+    aiValidationScore: {
+        type: Number,
+        default: null,
+        min: 1,
+        max: 10
+    },
+
+    aiSuggestion: {
+        type: String,
+        default: ''
+    },
+
+    // ✅ NEW — AI Recommendation
+
+    recommendation: {
+        type: String,
+        default: "Needs Manual Review"
+    },
+
+    confidence: {
+        type: Number,
+        default: 70
+    },
+
+    // ── ML Risk Score Fields ───────────────────────────────
+
+    riskScore: {
+        type: Number,
+        default: null,
+        min: 0,
+        max: 100
+    },
+
+    riskLevel: {
+        type: String,
+        enum: ['LOW', 'MEDIUM', 'HIGH', null],
+        default: null
+    },
+
+    // ──────────────────────────────────────────────────────
+
     createdAt: {
         type: Date,
         default: Date.now
     },
+
     updatedAt: {
         type: Date,
         default: Date.now
     }
 });
 
-// Update the updatedAt field on save
+// Update updatedAt automatically
 accessRequestSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
     next();
 });
 
-const AccessRequest = mongoose.model('AccessRequest', accessRequestSchema);
+// Text index for search
+accessRequestSchema.index({
+    resourceName: 'text',
+    requesterName: 'text',
+    reason: 'text'
+});
+
+const AccessRequest = mongoose.model(
+    'AccessRequest',
+    accessRequestSchema
+);
 
 export default AccessRequest;

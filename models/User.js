@@ -23,9 +23,14 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['REQUESTER', 'APPROVER'],
+        enum: ['REQUESTER', 'APPROVER', 'ADMIN'],
         required: true,
         default: 'REQUESTER'
+    },
+    department: {
+        type: String,
+        default: 'General',
+        trim: true
     },
     createdAt: {
         type: Date,
