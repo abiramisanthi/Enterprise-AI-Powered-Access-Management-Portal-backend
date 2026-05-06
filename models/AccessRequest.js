@@ -17,7 +17,7 @@ const accessRequestSchema = new mongoose.Schema({
     },
     accessType: {
         type: String,
-        enum: ['READ', 'WRITE', 'ADMIN', 'FULL'],
+        enum: ['READ', 'WRITE', 'ADMIN', 'FULL', 'DEPLOY', 'TEMPORARY'],
         required: true
     },
     reason: {

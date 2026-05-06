@@ -15,7 +15,7 @@ const router = express.Router();
 // Validation rules
 const createRequestValidation = [
     body('resourceName').trim().notEmpty().withMessage('Resource name is required'),
-    body('accessType').isIn(['READ', 'WRITE', 'ADMIN', 'FULL']).withMessage('Invalid access type'),
+    body('accessType').isIn(['READ', 'WRITE', 'ADMIN', 'FULL', 'DEPLOY', 'TEMPORARY']).withMessage('Invalid access type'),
     body('reason').trim().isLength({ min: 10 }).withMessage('Reason must be at least 10 characters')
 ];
 

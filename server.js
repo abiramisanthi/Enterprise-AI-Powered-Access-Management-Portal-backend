@@ -149,7 +149,13 @@ app.use(
         origin: [
             "https://fsd05-frontend.onrender.com",
             "http://localhost:3000",
-            "http://localhost:5173"
+            "http://localhost:5173",
+            "http://localhost:8080",
+            "http://127.0.0.1:8080",
+            "http://localhost:62193",      // Match the port in your screenshot
+            "http://127.0.0.1:62193",      // Match the port in your screenshot
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:5173"
         ],
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: [
