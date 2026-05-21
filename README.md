@@ -1,5 +1,4 @@
 # 🛡️ Enterprise AI-Powered Access Management Portal for backend 
-# Access Request Management — Backend
 
 A scalable Node.js + Express backend for an enterprise access request portal. This service powers authentication, request workflows, AI-enhanced validation, audit logs, analytics, notifications, and document export.
 
